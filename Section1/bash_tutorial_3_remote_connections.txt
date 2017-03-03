@@ -1,0 +1,134 @@
+#This tutorial will cover some of the basics of connecting computers over a
+# network with the command-line interface.
+
+#List of the tools used:
+#    ssh 
+#    scp (-rp)
+#    rsync (-av/z)
+#    sftp(put/mput,get/mget) or ftp/wget
+#    windows drive mount
+
+### ssh ###
+#From the man pages: "
+#    syntax: ssh [user@]hostname [command]
+#    ssh is a program for logging into a remote machine and for executing
+# commands on a remote machine. 
+#    If command is specified, command is executed on the remote host instead
+# of a login shell."
+
+#To end/exit an ssh session, simply type 'exit'.
+
+# Examples:
+
+# The following are simple forms for logging into a new shell on the computer
+# named [hostname] with the [username] account
+# ssh username@hostname
+# ssh username@hostname.domain
+# ssh username@IPaddress / e.g. ssh 128.20.255.255 (this is an historically
+# 'early' address in the IPv4 system)
+
+# If you do not specify a username, your current $USER will be used
+# Thus,
+# ssh hostname.domain
+# ... is equivalent to 
+# ssh $USER@hostname.domain
+
+# Go ahead and try to connect to a few machines on the
+# http://intranet.brainmap.wisc.edu/brainwiki/index.php/WADRC_Workstations
+# page.
+
+#Note: If you want a program with a GUI to display on your local machine,
+# you will need an X11 configured system, and to use the -X option to enable
+# X11 forwarding (unless it is used by default). This can be a bit touchy at
+# present depending on what computers you are going to/from, so let someone
+# know if you're having trouble with this. 
+# ssh -X username@hostname.domain
+# Using the upper case 'X' flag enables, and the lower case 'x' disables X11
+# forwarding. 
+
+### scp ###
+#[copied with edits from
+# http://stackoverflow.com/questions/343711/transferring-files-over-ssh]
+#Syntax: 
+#$ scp <source> <destination>
+
+#To copy a file from B to A while logged into B:
+
+#$ scp /path/to/file username@A:/path/to/destination
+
+#To copy a file from B to A while logged into A:
+
+#$ scp username@B:/path/to/file /path/to/destination
+
+#[end web source]
+#Of note: You will often be asked to enter a password when connecting to a
+# remote machine via ssh. If you are connecting as a different user, be sure
+# to specify that username. If you are using the same username, it does not
+# need to be specified. 
+
+#Some useful flags are:
+#    '-r' -- the 'recursive' flag which will copy all files and folders
+# contained in a specified directory.
+#    '-p' -- 'preserve' the modification/access times and 'modes' from the
+# original file(s)
+
+
+### rsync ###
+#rsync works much like scp based on similar syntax. Either the source or
+# destination of the files/folders can be remote, but not both. [some
+# material taken from linuxcommand.org/man_pages/rsync1.html]
+
+#Examples:
+# To 'upload' any local files with '.ext' from your folder on computer A to
+# a remote computer B /tmp directory:
+#$ rsync -t *.ext B:tmp/
+# The -t preserveS the timestamp on the files. 
+
+# To 'download' all files in a 'folder' from remote computer B to your
+# computer A.
+#$ rsync -av username@B:/path/to/folder/ /tmp/folder/
+
+# If you want to compress the files for transfer, simply add the -z flag.
+#$ rsync -avz /data/tmp/folder/ username@B:/Users/username/folder/
+
+### sftp ###
+#sftp is usually used if you don't know where the file you are trying to get
+# is, or if you are using a very old batching system for file transfers. In
+# any case, it is much like scp in batch mode, and like the shell in
+# interactive mode. 
+#Syntax:
+#   sftp [user@]host[:file ...]
+#   sftp [user@]host[:dir[/]]
+#   sftp [user@]host
+
+#The last of these calls to sftp will open the interactive mode, once you
+# have logged in to a temporary shell. The sftp shell is not as extensive as
+# your normal shell. Try to limit yourself to 'ls', 'cd', and the get or put
+# commands. 
+
+#To bring a file from the remote machine to yours, use the 'get' command
+# while in the interactive shell.
+#   sftp [user@]host
+#   sftp> cd /path/to/file.txt
+#   sftp> get file.txt
+#   sftp> bye
+
+#This will have downloaded the 'file.txt' file to the directory from which
+# you started the sftp session.
+
+### windows drive mount ###
+# From 'Computer' (Win7) folder, or 'Control Panel' (NT and XP) and select
+# "Map Network Drive"...[works in Windows XP through 7]
+# Pick a letter ('S' preferred for /mounts/data)
+# \\Server\shared_folder should be:
+# \\braindata.dom.wisc.edu\data
+# Select 'reconnect at logon'
+# If your DOM username is different than your ADRC username for some reason
+# (it shouldn't be), you may need to 'Connect using different credentials',
+# in which case you would provide the ADRC username for connecting to the
+# ADRC file system. 
+# Select 'Finish', and you will attempt to connect. 
+# Assuming all of the paths, names, and passwords are correct, you should
+# now see S:\ in the list of network drives, allowing you to easily
+# drag/drop files to and from your computer. 
+

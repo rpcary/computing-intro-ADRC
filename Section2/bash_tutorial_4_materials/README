@@ -1,0 +1,3 @@
+Please use the 'cp -r' command to copy this whole directory to your home directory before using tar or bzip on the files.
+i.e. use the below command from this directory...
+cp -r ../bash_tutorial_4_materials ~/

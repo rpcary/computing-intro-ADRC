@@ -1,0 +1,198 @@
+#This is a tutorial which will help you learn some of the basics of the 
+# command line interface. 
+
+#Commands we'll use:
+#   pwd
+#   ls [flags] <path>
+#   cd <path>
+#   [Tab]
+
+#Start a separate terminal session where you should see the shell prompt:
+#[user@machine ~]$ █
+
+#Type the following line (without the #) at the prompt:
+#pwd  
+
+#You should see the following:
+#[user@machine ~]$ pwd█
+
+#Hit Enter to execute pwd and watch what happens...
+#You should now see a path which represents your home directory, something
+# like /home/user or /Users/user.
+#'pwd' is a program which will print your working directory, thus pwd.
+#Knowing your working directory will be useful almost every time you are
+# navigating or executing a program from the command prompt. Handily, since
+# this information is so useful, it is often shown in multiple places, like
+# your prompt and in many terminal applications the header or title bar. 
+#Of note: On many systems, the tilde '~' symbol represents your home
+# directory. When you change directories (as we'll do later), you will
+# notice that the ~ at your command prompt will be replaced by the current
+# directory. 
+
+### Topic: ls ###
+#Next, let's try a tool you will be using any time you want to see
+# something, 'ls'. Type 'ls' on the command line, like so...
+#[user@machine ~]$ ls█
+
+#Once you hit Enter, you should see the contents of your current directory
+# printed to the screen via the 'standard output'. 
+#The 'ls' program is a tool that allows a user to 'list' files and folders
+# that they want to see.
+#Since bash is a text interface, 'ls' is the default tool for navigation and
+# seeing what exists where.  
+#You can modify what 'ls' returns by passing 'flags' or 'paths' to the ls
+# program.
+#Sometimes you want to see more information about the contents of a
+# directory. 
+
+#To do this, pass the 'long' flag as '-l' to the ls command like so...
+#[user@machine ~]$ ls -l█
+#Now when you hit Enter you should see the same files and folders, with more
+# information about the size of the file/folder, information about the time
+# it was created or last modified, as well as the owner and the permissions
+# of who can read, write, or execute those files or directories. We'll get
+# back to ownership and permissions later.
+
+#A note on 'alias'. In an effort to make things easier, your profile likely
+# has a number of default 'aliases' which look for certain patterns or
+# sequences of characters you might type in the shell and replaces them with
+# other (normally more complex) sequences. For example, in many systems 'll'
+# is an alias for 'ls -l'. This means that when you type 'll' and hit enter,
+# the shell replaces 'll' with 'ls -l', which is the 'long' command for ls.
+# If you type in 'alias' at the prompt, you should see the list of all
+# 'active' aliases for your profile. In a later lesson we'll address how to
+# modify this list.
+
+#For now, let's try another example using ls. If you want to see folders in
+# the root directory you can pass the '/' symbol to the ls program as
+# follows...
+#[user@machine ~]$ ls /█
+
+#Try it and hit Enter to see the folders in your root directory. 
+
+#Next, if you are on a Linux machine try
+#[user@machine ~]$ ls /home█
+#If on a Mac, try
+#[user@machine ~]$ ls /Users█
+#...and hit Enter
+
+#You should see a list of all the users who have a profile on your computer
+# (if on Mac), or more broadly, your filesystem (if on Linux, or using putty
+# from Windows). 
+
+#If you are on a computer that has an ADRC mount, that is, which has a
+# connection to the ADRC networked storage, you can look at some of the raw
+# data directories with the following command.
+
+#[user@machine ~]$ ls /mounts/data/raw█
+
+#You should see a number of directories with all of the raw directories of
+# our imaging data. 
+
+### Topic: cd ###
+#The next most common tool you will likely be using is called 'cd'. This
+# program will change your working directory. It is much like
+# 'double-clicking' a folder in a windows environment, and allows you to
+# more easily work in a folder that you have navigated to.
+
+#To use cd, simply type 'cd' and then a path as the argument. 
+#[user@machine ~]$ cd /mounts/data/raw█
+
+#This will take you to the 'raw' directory. Now when you use ls, you will
+# see the contents of the 'raw' directory. 
+#You don't always need to type out the full path of where you are going
+# though. If you simply want to move 'up' one directory, you just need to do
+# the following...
+#[user@machine ~]$ cd ..█
+
+#Try it and you should now be in /mounts/data/. This bring up a point of the
+# file system, which is that the current directory can be referred to by a
+# single point '.', and one directory up with two dots '..', such that if
+# you want to go up two directories, you would type...
+#[user@machine ~]$ cd ../..█
+
+#At any time you can return to your home directory by typing cd without any
+# arguments. This is equivalent to-> [user@machine dir]$ cd ~
+
+### Topic: tab completion ###
+#Let's take a minute to introduce 'tab completion,' a useful trick that will
+# make your life easier™. 
+
+#The command prompt you are using has some features which are very friendly
+# to a programmer or super user (that would be you...soon). One of these
+# allows the prompt to complete partial paths, or expand variables. 
+
+#Example 1:
+#Enter "ls /bi" at the shell prompt...
+#[user@machine ~]$ ls /bi█
+#...and then hit the [tab] key. Your prompt should complete the path you
+# began by adding the 'n/' characters like so...
+#[user@machine ~]$ ls /bin/█
+#...now hit Enter. You should be shown the list of programs that are
+# 'essential' to your system, normally included with the operating system as
+# 'binaries' (i.e. 'bin'). This is often a partial list of some basic tools
+# like 'ls', 'cp', 'cat', and 'rm'.  
+#Now use the 'up arrow' ↑, to recall your previous command (ls /bin/) and
+# hit the tab key twice.
+#You should get a list of all programs and folders in the '/bin/' directory.
+# If there are more than 100 or so items, you will be prompted for whether
+# you want to see all of the items or not (y/n). If you hit 'y' you will be
+# shown a number of the items depending on the size of your terminal. If the
+# list does not complete "--More--" you can use the spacebar to continue
+# paging down, or 'q' to exit the list. 
+#Tab completion can be very useful when typing out long paths, or making
+# sure that a file exists, since, if you are not able to tab-complete a path
+# and filename, it means that either your path is incorrect, or the file
+# does not exist. 
+#Try to practice using tab completion throughout the rest of this tutorial
+# any time your are typing out a path. This will usually make the process
+# faster, and you have the added benefit of checking that your path exists
+# while typing.
+
+#Tab completion will 'fill in' a path or name until there is a 'branch
+# point'. At this point, there are either no more options (e.g. when you've
+# reached the end of a path), or more than one option (e.g. /home/user1/ vs.
+# /home/user2/ will stop at /home/user█) and you will need to add the next
+# letter or symbol to complete the path or filename you want. 
+
+#As mentioned briefly before, hitting tab can also expand variables. For
+# now, we won't get into what these are, or why they exist, but just try the
+# exercises below to get an idea.
+
+#[user@machine ~]$ cd /mounts/data/preprocessed/visits
+#[user@machine ~]$ ls
+
+#After executing ls with 'Enter', you should see a number of protocols where
+# we store our preprocessed data. Occasionally, a program will ask for a
+# full path. It can be a pain to re-enter the full path from the root
+# directory when you are just four directories down, but a quicker way is to
+# rely on an environment variable with your current working directory called
+# PWD. If you put the $ symbol before an environment variable, the shell
+# will know to treat it like the value the variable represents. Let's try it
+# below. 
+
+#[user@machine ~]$ ls $PWD/█
+
+#Hit [Tab] when your prompt looks like the above (be sure to include the 
+#following slash), and it should 'magically' be replaced by the full path to
+# you present working directory. Nice!
+
+#[user@machine ~]$ ls /mounts/data/preprocessed/visits/█
+
+#Feel free to look around at the protocols with ls and cd. If you want a
+# challenge, look up the manual pages for ls and cd (type "man ls" or
+# "man cd" into the prompt and use the arrow keys to navigate -- of note,
+# bash built-ins like 'cd' have a different man page than other programs.)
+# and see what things you can learn. 
+
+#Congratulations! You can now navigate in Unix-like environments. We'll be
+# tackling accessing remote machines, copying, and moving files in
+# upcoming tutorials.The next tutorial will have 'file_interaction' in the
+# name. You can go on to that now. 
+#Don't feel discouraged if using 'ls' or 'tab completion' doesn't make much
+# sense yet. There are a number of things about working in Unix-like
+# environments that only seem to make sense after you have been using them
+# for a while. It can seem bizarre how much time and effort is required to
+# learn this new way of navigating the computer environment, until you
+# suddenly realize how quickly and efficiently you can find and access
+# files, or supplement the programs you may eventually write. 

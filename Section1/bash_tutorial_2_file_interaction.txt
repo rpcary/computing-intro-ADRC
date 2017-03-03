@@ -1,0 +1,152 @@
+#This tutorial will cover some very basic file interaction techniques.
+
+#Commands we'll use:
+#   mkdir
+#   cp
+#   mv
+#   rm
+
+#If you see the [user@machine ~]$ prompt, this is an invitation in the
+# tutorial to try the commands that follow it.
+
+#Let's start with your home directory. If you start a terminal, you should
+# be located at ~, or '/home/user', or perhaps /Users/user. Whatever the
+# case, the first step will be to make a directory where we can play around.
+
+#The command to make a directory is conveniently 'mkdir'.
+#Syntax:    mkdir [optional flags] <dir_name> [optional extra directories]
+#Example:   mkdir dir1
+#Example:   mkdir /absolute/path/to/directory
+
+#Useful tips:
+#   -Commands in bash use spaces ' ' to delineate arguments in a command. If
+# you put a space in your directory name without a special character, it 
+# will assume you are asking to make two separate directories.
+#   -There are ways to make directories and files with spaces in the name
+# (with escape characters like '\'), but don't. It's not good practice. 
+# Also, it's evil. Please don't.
+
+#Example:
+#[user@machine ~]$ mkdir test_directory
+
+#Note we used the underscore '_' to break up words. You will see this 
+# everywhere. Try not to overdo it yourself. 
+
+#When you 'ls' now, you should see a new directory called 'test_directory'.
+# Let's make a file that we can move into the test directory.
+
+### cp ###
+
+#Syntax:    cp [optional flags] <source file/dir> <destination file/dir>
+#Example:   cp file.txt ../temp/file.txt
+
+#Try the six commands below in order. What will be doing is creating a blank
+# file named 'newfile', checking to make sure it's there with ls, and then
+# making two copies of that blank file. After the copies, the 'ls' commands
+# will show you your home directory and the contents of the directory you
+# just made. 
+
+#Example:
+#[user@machine ~]$ touch newfile
+#[user@machine ~]$ ls
+#[user@machine ~]$ cp newfile test_directory/
+#[user@machine ~]$ cp newfile test_directory/newfile2
+#[user@machine ~]$ ls
+#[user@machine ~]$ ls test_directory
+
+#What happens if you try to copy the 'test_directory' though?
+#Go ahead and try it.
+
+#[user@machine ~]$ cp test_directory testdir
+
+#If your system is set up like mine, you should have gotten the following
+# error. cp: omitting directory `test_directory'
+
+#The trick here is to pass the -r flag for 'recursive' copy. This will allow
+# you to copy a directory and all of its contents. 
+
+#[user@machine ~]$ cp -r test_directory testdir
+
+#If you want to copy a folder to somewhere other than your current location,
+# you simply supply the full path.
+
+#[user@machine ~]$ cp -r test_directory /tmp/testdir
+
+#This will put a copy of the test_directory in your /tmp/ folder. 
+
+#Now let's move one of these directories without copying.
+
+### mv ###
+
+#The mv command can be more 'dangerous' than cp, since you are no longer
+# left with the original file. 
+
+#Syntax:    mv <source file/dir> <destination file/dir>
+#Example:   mv file1.txt file2.txt #This is a 'rename' use case
+#Example:   mv file1.txt ../file1.txt #This is a 'change location' use case
+
+#[user@machine ~]$ mv testdir tmp_testdir
+
+#Adding the 'tmp_' prefix to a folder is a one way to mark it for yourself
+# for later removal.
+
+### rm ##
+
+#Now let's clean up our space a little. If you didn't make a file named 
+# 'file1.txt' before, do so now. You can do this with the 'touch' command.
+
+#[user@machine ~]$ touch file1.txt
+
+#Check that the file exists in your current directory with ls before
+# continuing. Once you're sure it's there, we can use the 'rm' command to
+# remove it. Go ahead and try that now.
+
+#[user@machine ~]$ rm file1.txt
+
+#Note whether your machine asks you if you're sure. Some environments will
+# ask 'do you want to delete file "file1.txt"?(y/n)'. Some give no warning
+# (often because they added a '-f' for 'force' with an alias, which skips
+# the safety step). Some will only ask if you are trying to delete files or
+# folders with a different owner, but this depends on who set up your
+# system.
+#Check whether the file still exists with ls. It should be gone. 
+#What happens if you try to delete a directory?
+#If you still have a 'test_directory' we can practice on that. If not go
+# ahead an make a 'test_directory' now with the mkdir command. 
+
+#Once you see that test_directory/ exists with ls, try to remove it with rm.
+
+#[user@machine ~]$ rm test_directory
+
+#When you hit enter you will probably get a response along the lines of 
+# "rm: cannot remove `test_directory/': Is a directory". Well, yes, it is a
+# directory, but why can't we remove it? It's difficult to know intent
+# (without reading a man page), but since the default behavior of rm is to
+# return an error when trying to delete a directory, we can assume that this
+# is another safety feature to keep us from accidentally deleting a folder
+# when we meant to delete a file. 
+#If you need to remove a directory, you will normally need to pass the '-r'
+# flag for 'recursive', which tells the shell that you do indeed mean to 
+# delete a folder and all of its contents recursively. 
+
+#[user@machine ~]$ rm -r test_directory/
+
+#IMPORTANT NOTES:
+#   1. Some people add a './' when deleting things locally. You *can* do
+# this if you are always careful to tab-complete, though it is usually
+# considered *bad practice*. This is because if you forget the '.' at the
+# beginning and you have already added a -f, -r, or -rf, you are now in the
+# situation of deleting files or folders from your root directory with the
+# 'safety' off. This is how bad things (like broken computers) happen. 
+#   2. If you are using a wildcard like the asterisk '*', it is common to do
+# an 'ls' instead of rm first, to make sure you are selecting only the files
+# you remember. 
+#   3. In all normal circumstances we cannot 'undo' the rm command. Be sure
+# you want to get rid of whatever you are deleting. In some circumstances we
+# have backups, but if you delete something you were working on all day, it
+# was not backed up. Be careful. Please.
+
+#The next tutorial will work with remote connections, and moving files to
+# and from computers connected by a network. Look for a file with
+# 'remote_connections' in the name. Go ahead and start on that now. 
+

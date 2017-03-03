@@ -1,0 +1,450 @@
+#This is a tutorial that will help you build a few basic scripts in bash
+# and (hopefully) teach you some methods for making your own.
+
+
+### First Steps ###
+#Let's start with a few things that your script will need, in order to
+# execute in the Linux or Mac environments. 
+
+#Scripts, for the purpose of this tutorial are simply files, containing text
+# (to be interpreted by the shell), which have been given executable 
+# permissions.
+#More simply, the three necessary elements for a script are: 
+#   1. A file
+#   2. Text (naming the interpreter + script code)
+#   3. Executable permission
+
+#The shell, in this case bash, reads the lines of the script from top to
+# bottom, and runs the commands in the order it sees them. 
+#If there is an error which prevents any part of the script from running,
+# the default behavior is for the script to stop at that point and print an
+# error to the terminal. 
+#Unless you execute a program 'in the background', bash will halt keyboard
+# input (except for the interrupt commands Ctrl-C or Ctrl-Z) until the
+# program has finished executing. (You can try this...at your own risk,
+# and notice that some characters will be printed during the script
+# execution, but most are stored and appear at the prompt after the program
+# has finished running) 
+
+#Also for the purposes of this tutorial we will start you with the positive
+# habit of the 'shebang' line, as the first line, for all bash scripts. 
+#The shebang line should look like the following...
+
+#!/bin/bash
+
+#Confusingly, since I have used the '#' character to denote lines in these
+# tutorials, you want *all* of that first line, including the 
+# sharp/pound/hash symbol '#'. That is, "#!/bin/bash" should start all
+# scripts (unless your system stores bash elsewhere...like /usr/bin/bash)
+
+## Guidelines ##
+#There are some good guidelines pulled directly from the following guide...
+#http://www.tldp.org/LDP/Bash-Beginners-Guide/html/Bash-Beginners-Guide.html
+# which should be kept in mind when writing shell scripts...
+#   1. A script should run without errors.
+#   2. It should perform the task for which it is intended.
+#   3. Program logic [should be] clearly defined and apparent.
+#   4. A script does not do unnecessary work.
+#   5. Scripts should be reusable.
+
+
+### First Script - Hello World ###
+#In keeping with tradition, we will make 'Hello, world!' our first script. 
+# You will need some way to write text to a file (nano/vim/gedit/subl etc.).
+# See below:
+# In a file named 'hello' write the following text...
+
+#!/bin/bash
+echo "Hello world!"
+
+# Save that file, and change the permissions to 'executable' via
+#   []$ chmod a+x hello
+
+# Once you have completed the steps above, you should check that the file is
+# truly executable with the 'ls -l' command. If you see an 'x' every three 
+# characters, as in '-rwxrwx--x+', then your file is executable. 
+# Last step...execute the program on the command line...
+# Either of the next two options will work. The first will autocomplete
+# where the second one will not (why might that be?).  
+#   []$ ./hello
+#   []$ hello
+
+#If all has gone according to plan, you should see Hello world! printed to
+# your terminal. 
+#Some things that could go wrong:
+#   1. Bad interpreter path. To fix this use "[]$ which bash" and use the
+#       resulting path in your shebang line, instead of what gave the error.
+#   2. Permissions not set. "bash: ./hello: Permission denied" means
+#       that the executable permission was not properly set. To fix, you
+#       should use the following command: []$ chmod +x ./hello
+#   3. Unexpected EOF. Make sure all quotation marks have a matching pair.
+#   4. Syntax error: unexpected end of file
+
+
+### The Loop ###
+#In this section we'll make a short script from the presentation and explain
+# what it does.
+
+## mk_10.bash ##
+#For this script, it is good to work in a 'safe' space, preferably a
+# temporary directory which you will delete afterward. There is a pre-made
+# version of this script for you to check your attempt against in the 
+# unit 6 'script_practice' folder. 
+#What we are aiming for is to execute an arbitrary number of commands, in
+# this case creating a number of empty files, based on the 'for' loop 
+# command. 
+#Last thing to note before beginning. In bash, variables are noted by the $
+# symbol. You define a variable via an equals sign (e.g. A='text1'), and
+# then refer to it later in your script with the cash/dollar sign (e.g. $A).
+# Some variables are set at execution (your command line arguments), and
+# some are set during conditional testing or as a part of a loop.
+
+#Exercise:
+#Open a text editor and add the single lines in the following exercise that
+# follow directly after double dashes '--'. 
+#To start every script, we want the shebang line:
+--
+#!/bin/bash
+
+#Next let's add a description about what the script does, or should do...
+--
+# This script creates 10 files in the current directory.
+
+#Okay, good. Now comes the fun part. Bash has a number of commands which 
+# allow scripts to make many iterations ('for' loops), make decisions 
+# ('if' statements), or execute according to the value of some variable
+# ('while', 'until', or 'case').
+#What is a loop? Generally, it is a series of commands, during which some
+# single variable changes for each iteration. 
+#To demonstrate how a loop works, we'll use the 'for' command to loop over
+# an array of numbers. There are a few ways to make an array of numbers,
+# but we'll go with a simple one to remember called brace expansion. 
+
+#Elements of the 'for' loop. The loop should start with the eponymous 
+# command, 'for'. Then, the programmer must decide the name of the variable
+# which will hold the iterating value during each loop. In this case we'll 
+# use the letter 'i' to stand in for 'iterator'. Then we use 'in' to note
+# what series our iterator will be moving through, and finally we create
+# the series itself. For style purposes, we normally end the first line 
+# with a '; do' which are necessary elements of the for loop, but can be on
+# another line and bash will still interpret it correctly. This is all much
+# easier to see demonstrated.
+--
+for i in {1..10}; do
+
+# That above, is all that's required to begin a for loop. On the next line
+# you can put the commands you wish to repeat. For the purpose of
+# readability, the convention is to indent the text of a loop so that the 
+# loop is clearly recognizable. 
+
+#To make a file, we need only refer back to any of our previous lessons with
+# 'touch' or redirecting output. The following will do...
+--
+    touch $i'.file'
+
+#That will create an empty file during each loop, named 1.file, 2.file, etc.
+# To terminate the for loop, we simply use the 'done' command.
+
+--
+done
+
+#With 'done' added to your script, all you need to do is save it, and make
+# sure it has executable permissions. 
+#Go ahead and run it. You should see ten files created. If there was an
+# error, see if you can figure it out. If you don't see ten files, and 
+# you're not sure why, try asking someone nearby. 
+#The finished script should look like the following...
+
+#!/bin/bash
+# This script creates 10 files in the current directory.
+for i in {1..10}; do
+    touch $i'.file'
+done
+
+#An important aspect of the for loop, is that the stopping point is based
+# entirely where we set it. We could have asked for 100, 1,000, 10,000, or
+# even 10^100 files (theoretically, though in practice 10^100 would wreak 
+# havoc on your system, and our computer would have dutifully creating them
+# for us. It is almost always wise to check what your script is doing on a
+# small subset (e.g. 10 files), instead of going straight to 10,000 loops. 
+
+
+### Passing Info to Scripts ### a.k.a. command_line_arguments.bash
+
+#Let's take a quick detour to illustrate how to pass information to your
+# scripts. We already know that the $ symbol is used to mark a variable.
+# There are some variables that are set inside a script, which are usable
+# from the second line onward (after the #!, which is the first line). 
+#The code below already exists as a script in the unit 6 scripts practice
+# folder named 'command_line_arguments.bash'.
+
+#!/bin/bash 
+#This script expects at least one argument after the program.
+
+echo "number of arguments: $#"
+echo "name of program    : $0"
+echo "first argument     : $1"
+echo "all arguments      : $@"
+
+#Please execute the program with a couple of arguments like so:
+#   []$ command_line_arguments.bash arg1 arg2
+
+#What did you get? If you added any arguments, you will get the number of 
+# arguments provided (stored in the $# variable), the name of the program,
+# the first argument ($1, where $2 would refer to the second and so on),
+# and finally a list of all arguments passed to the program. Why might it be
+# useful to know the number of arguments, or have a shorthand for referring
+# to the complete list of arguments? Many reasons, which we'll address in
+# the next section, but first a few more notes about passing text into a 
+# script.
+
+#If we want to pass arguments to a script from a pre-made list, we can do
+# that with something called Command Substitution. Command substitution can
+# be very useful, for example by allowing you to create a variable as a 
+# result of a loop (selectively pulling from a larger list, say), or as a
+# way to create a temporary variable. 
+#The following two commands are effectively identical, although the backtick
+# form is now deprecated for a couple reasons. If you use them 'in the wild'
+# you might notice that quoted text or variables and backslashes behave 
+# differently with backticks than parenthesis. The parenthetical notation
+# is also preferred, because it allows nested commands/shells. 
+
+#   []$ command_line_arguments.bash `<subjects.txt`
+#   []$ command_line_arguments.bash $(<subjects.txt)
+
+#Go ahead and try them out. 
+#One big caveat with passing information into a script: some text is unsafe
+# to execute or pass to a command. If, for example, there was a control
+# character sequence, your script could abort, it could pause indefinitely,
+# or it could fail only in a small silent way which you never notice. If you
+# are writing a script which other people can pass information to, it is 
+# wise to clean, or pre-screen that information before your script sees it.
+
+#Okay, detour over, on to the next section.
+
+
+### Using Input in a Script ###
+
+## mk_subs.bash ##
+#Now, let's do something much more useful than making a series of arbitrary
+# files. We can take input from the command line, as in the previous 
+# example, and loop over the elements of a pre-made text file. Why is this 
+# useful? For most of the processing we do in this lab, you start out with a
+# list of subjects that you need to do some processing on. Once you master
+# the for loop, you can very quickly perform any action in ALL of them with
+# one script. If you're like me, that should sound *awesome*, both in the
+# 'that's rad' sense as well as the 'I should be careful' sense. 
+
+#Open a text editor and write or copy the following lines...
+
+#!/bin/bash
+# Make files based on some input list to $1.
+for i in $(<$1); do
+    touch $i'.file'
+done
+
+#Note the differences to the mk_10.bash script.  
+#First, the most obvious change is the use of command substitution to pass
+# the list of subjects into the script. The '<' symbol is a way to get the
+# text from a file, instead of the filename (as we would have done with 
+# 'for i in $1;'). 
+#If you haven't cleaned up your folder since the 'mk_10.bash' script, you
+# can safely accomplish it with the following command...
+#   []$ rm [0-9]*.file 
+#This rm command looks for a number, then any number of characters, followed
+# by the '.file' extension, which we have been using. 
+#Now, go ahead and run the mk_subs.bash script from above, and make sure to
+# pass in the 'subjects.txt' file as the first (and only) argument..
+#   []$ ./mk_subs.bash subjects.txt
+#You should now see five files named sub[1-5].file in your current
+# directory. Don't get rid of those quite yet, as we'll have a chance to use
+# them in the next and final script.
+
+
+### Decisions, Decisions.... ###
+#For the end of this tutorial we'll introduce the 'if' construct (or at
+# least part of it), function definition, and taking user input to drive the
+# actions your script takes. By the end of this example, you will have a 
+# bash script that is beginning to look more like a program in a general
+# programming language. 
+
+#There is a completed version of this script in the unit 6 script practice
+# folder that you can read along with or check your work against. You'll
+# probably get the most out of it if you write the code along with the 
+# tutorial and then try to execute it at the end. You're more likely to run
+# into an error that way, and the error will show you something about bash.
+
+## ch_exts_prompt.bash ##
+#We'll start with the shebang line and a description of our script. For now
+# you don't need to copy the explanation. The shebang line will do. When you
+# finish the script, write your own description, that makes sense to you, as 
+# practice. 
+--
+#!/bin/bash
+#This script will change the extention on a list of files, after checking
+# with the user. The script expects two arguments.
+#Argument format expected as '.txt', '.mat', etc.
+#This script is not ideal when re-naming hundreds, or especially thousands
+# of files, as the user is prompted to review the full list of unchanged and
+# changed files.
+
+#Okay, so far so good. Now let's add that irreplaceable bit to our script
+# that will make it useful to us in the future, or better yet, for other
+# people. Usage (sometimes 'syntax', when explaining the syntax 
+# specifically) is the instructions which should kick in if your script
+# fails or is being invoked in a circumstance where it should not.
+# Usage text should have two things at a minimum. (1) The intended use of 
+# your script. (2) An example usage or syntax that tells people how to use
+# it and what it expects (or at the least what it can handle).
+--
+## usage ##
+usage() {
+    echo "This script will change the extention on a list of files, after checking with the user. The script expects two arguments."
+    echo "Argument format expected as '.txt', '.mat', etc."
+    echo "Example Usage: Change all files from '.file' to '.txt'"
+    echo "[]$ ch_exts_prompt.bash .file .txt"
+    echo ""
+}
+if [ $# -lt 2 ]; then 
+    usage
+    exit 1
+fi
+
+#What we did there was to define a function via the following formula:
+#function_name() {
+#   [function body]
+#}
+
+#The name must be one word without spaces, followed by the parenthesis () 
+# with or without a space, and then opened and closed by the curly braces.
+# After defining a function, you can call it anywhere (after the 
+# definition), simply by using its name like a program or script. 
+#After defining the function that prints the usage information, we use an if
+# statement to test whether or not to actually call all of that usage info.
+#The 'if' statement works according to the following formula:
+#if [ element(s) to test ]; then
+#   [body of code to execute]
+#fi
+
+#The if statement is very versatile, and if you want to know more about how 
+# to write the test statement or how they work, I recommend the following 
+# resource for a broad range of examples (though it is not very accessible).
+#www.tldp.org/LDP/abs/testconstructs.html
+#For our purposes, know that we are testing an integer represented by $#,
+# the number of arguments, and whether that number is less than '-lt' the
+# expected number of arguments (2). The point of that 'if test' is that if a
+# user only enters one or fewer arguments, the script will print the usage
+# instructions and exit. We also snuck in an 'exit status' or 'code' with 
+# the 'exit 1', which we can retrieve at the end of a program to tell if it
+# ran successfully or errored out prematurely. 
+
+#Now on to more interesting things, like creating interactivity. 
+#What we'd like to do is prompt the user before they rename files, and to do
+# that we need to get the list of files we plan to change. 
+
+--
+## Making the prompt ##
+FILE_LIST=$(ls ./*"$1")
+
+#We can get the list of files with the 'ls' command, and specifying our
+# current directory with './', followed by the asterisk wildcard which will
+# match any string (filename) and which ends with the pattern passed in as
+# the first argument to the script, $1. As practice, try echo-ing the
+# statement to the right of the equals sign. []$ echo $(ls ./*.file)
+# What happens when you use quotes? []$ echo "$(ls ./*.file)" ...Hm. 
+
+#Next we'll describe to the user what we're about to do, and use the file
+# list variable to check if the pattern they entered will give the desired
+# results.
+
+--
+echo "Do you wish to rename the following files?"
+echo "$FILE_LIST"
+echo "to"
+echo "${FILE_LIST//$1/$2}"
+
+#The code should be pretty self-explanatory, up until the 
+# ${FILE_LIST//$1/$2}" bit, where we are introducing a way to globally 
+# replace one string of text with another inside of a variable. In other
+# places you may see ${variable/str1/str2}, which replaces only the first
+# instance of 'str1' with 'str2', and ignores all other instances. For this
+# reason "${FILE_LIST/$1/$2}" doesn't work, since only first instance of $1
+# is replaced. What if we didn't have a way to globally replace the string?
+# A for loop might work...
+#   []$ echo "$(for var1 in $FILE_LIST; do echo ${var1/$1/$2}; done)"
+# Or how about sed?
+#   []$ echo $(echo $FILE_LIST | sed s/$1/$2/g)
+# A function with sed?
+#   echo $(func1() { echo $FILE_LIST | sed s/$1/$2/g; }; func1 $1 $2)
+
+#They all end up with the same thing, echoing a list of files with '.txt' on
+# the end instead of '.file', that we can use to prompt the user. Speaking
+# of which, we'll prompt the user next.
+
+--
+read -p "y/n[ENTER]" test1
+
+#To capture input from the keyboard, we use the 'read' command. I've
+# included a prompt '-p' as part of read, though we could have just used
+# another echo command with "y/n[Enter]" instead. The read command will
+# store whatever the user enters in the $test1 variable, as soon as they hit
+# [Enter]. 
+#Okay, great! We now have a list of files to change, and we know if the user
+# wants to change them. All we need to do is write the part where the files
+# are changed (or not). 
+#There are a few design decisions to make, but to keep it simple, I'll stick
+# with the 'mv' command to do the renaming. This limits how we can use our
+# list of files, since 'mv' doesn't handle multiple output names. We will
+# need to break up the list, and a great way to do that is with the 'for'
+# loop. 
+#Okay, we've established that we'll use a for loop and the mv command. To
+# test whether the user said 'y' or anything else we'll use an 'if' test.
+# Finally, if they entered anything other than 'y', we want to skip the 'mv'
+# command (I use the 'else' construct, which is a part of 'if'), then report
+# the action taken, and exit the script. See below for my solution...
+
+--
+## Testing Input and Making a Choice ##
+if [ $test1 == 'y' ]; then
+    echo "Renaming..."
+    for f in $FILE_LIST; do
+        mv $f ${f/$1/$2}
+    done
+    echo "Complete."
+else
+    echo "Exiting without renaming..."
+    exit 0
+fi
+
+#You'll notice that I went with ${f/$1/$2} which only replaces the first 
+# instance of the input pattern. What happens if someone puts "file" in as
+# the pattern to match, and there is a file named "filename.file"? I'll end
+# up with a file named "txtname.file" instead of "filename.txt". There are
+# better solutions than the one I've written. If you really feel like going
+# the extra mile (after reading the next paragraph), see if you can find a
+# better solution than mine. I'll be happy to see it and give feedback if
+# you can manage to write it or explain it during the initial tutorial time. 
+
+#If you have been following along, try writing this last bit to your own
+# script, and making it executable. If you can, try to write a description
+# of the script that makes sense to you. Then, if you still have the 
+# 'sub1.file sub2.file sub3.file...' files in your current directory, go
+# ahead and try the script out! Outline of steps for making a 'safe'
+# folder to test it out on to follow...
+#
+#   []$ mkdir tmp
+#   []$ mv sub*.file tmp/
+#   []$ cp ch_exts_prompt.bash tmp/
+#   []$ cd tmp/
+#   []$ ./ch_exts_prompt.bash .file .txt
+#
+#It is at this point that many of you will run into your first 'now what?'
+# error, which is just my name for an error you've never seen before, and
+# have no idea what it means. Try asking someone nearby if you don't figure
+# it out with a little experimentation. Next, consult Google, or an
+# instructor, if one of us is about. You'll get it eventually. Promise.
+
+#Once you successfully complete this script, you can consider yourself 
+# officially armed with the knowledge for building your own scripts! My
+# sincerest congratulations. Please use your newfound powers for good.
+

@@ -1,0 +1,327 @@
+#This is a tutorial which will help you understand the 'basic toolkit' of 
+# programs in bash as they relate to handling text (and files)
+
+## echo ##
+#The echo command is covered earlier, but it is worth noting that for the
+# purposes of testing any of your commands, you can simply put 'echo' before
+# the command to see how bash is interpreting it.
+
+#Ex--
+#   Let's say you are trying the following command, and getting a strange
+#       error, which you finally figure out means you have too few arguments
+#      []$ my_program.bash $MNIDIR /mounts/data/analyses/$USER/
+#      --If you simply add an 'echo' in front of this command, you will get
+#       to see what bash sees. In the case above '$MNIDIR' returns a null 
+#       value, because what you meant to use was '$MNI_DIR'
+#      --returned from echo: 
+#      my_program.bash  /mounts/data/analyses/rpcary/
+       --what we expected:
+       my_program.bash /apps/freesurfer/mni /mounts/data/analyses/rpcary/
+#      --We now understand the issue (a typo, i.e. the missing underscore)
+
+### Redirecting Data Streams ###
+#The most basic example of redirecting a data stream might be the directing
+# of text from the command line into a file with the '>' symbol.
+#Ex-- (Feel free to treat these as exercises, if you wish):
+#   1. The following command will take text that was input to the 'echo' 
+#       command and put it in a newly created file named 'newfile.txt'
+#      []$ echo "this text will be stored" > newfile.txt
+#       Use the cat command ([]$ cat newfile.txt) to see the contents of the
+#       new file.
+#Neat-o gang! Your programs can now 'write' to a log as they execute, as 
+# long as you tell them what to say when they're doing it. If you have an 
+# important step in your script, it is often useful to print it to a log.
+#A note of caution. The single '>' sign, will delete any text that is
+# currently in the 'newfile.txt' file, if it already exists. 
+#
+#Next up, we'll introduce the '|' or 'pipe' as it is known. The symbol tells
+# bash to 'pipe' the output of one command into the input of the next
+# command. With the pipe command you can chain many commands together.
+#   2. []$ echo "../$USER/tmp/dicom" | sed 's,tmp/,temp/,g' > newpath.txt
+#       The command above takes some text from the command line and passes
+#       it through the string editor 'sed' which replaces the 'tmp/' from
+#       the input with 'temp/', and writes the modified string to a file 
+#       called 'newpath.txt'. We'll explain 'sed' later.
+#   3. []$ echo "../$USER/tmp/dicom" | sed 's,tmp/,tmp2/,g' >> newpath.txt
+#       This command '>>' adds a new line and the (differently) modified 
+#       path to the end of the 'newpath.txt' file. If you are afraid of 
+#       over-writing a log file, '>>' may be a good option.
+#   4. As an example you can also pass text from a file to a command with
+#       the '<' symbol.
+#       []$ awk 'FNR == 2 {print}' < newpath.txt
+#       Would print out the second row (line) of the newpath.txt file,
+#       since that is what "awk 'FNR == 2 {print}'" will do for text input.
+
+#Example of redirecting stderr (i.e. '2'):
+#   Try using find on a directory with multiple read-protected folders
+#       find /home -name $USER -type d
+#   Awful. Errors galore. Now try it after redirecting only the errors. 
+#       find /home -name $USER -type d 2>/dev/null
+#   So clean!
+
+### Sorting Text ###
+#Sorting things is a fundamental, often one of *the most fundamental* things
+# you learn when you start programming. This isn't always the case, and some
+# people never do much sorting in their programs. We'll carry on a grand
+# tradition by at least offering you the functionality of sorting things, 
+# even if we don't cover the theory behind it.
+
+## sort ##
+#sort, when used with other programs, can be very useful for things like
+# improving readability of a directory, re-ordering a list of inputs (like
+# subjects for analysis!), or checking the integrity of your script outputs.
+
+#Try some of these exercises (until you're tired of sort, then move on)
+#   --Navigate to the '/mounts/data/analyses' directory since
+#       there are so many different directory owners...
+#   1. Sort a list of files or directories by owner using the 'key' flag -k
+#       []$ ls -l | sort -k 3  (it may take a moment or two to execute)
+#       -This works because we are looking at the third column from the
+#        ls -l printout, which is the 'owner' of the file or folder.
+#   2. Sort a list of files or directories by owner, then by filename
+#       []$ ls -l | sort -k 3,3 -k 9 
+#       The ',' breaks the start/end of -k sort-by
+#   3. Sort a list of numerical values as numbers, instead of as strings
+#       since strings are the default 'sort-by'...
+#       go to /mounts/data/analyses/rpcary/teaching/Section2/tmp where you
+#       should see one hundred folders numbered 1 through 100.
+#       Use `ls` and `ls -1` to look at the folders...
+#       Sort these folders numerically with the '-n' flag
+#       []$ ls -1 | sort -n
+#       This also works if you simply use `ls | sort -n` ... why might that 
+#       be the case?
+#   4. sort is often used on the contents of a file...
+#       Try sorting the contents of the following file... 
+#       /mounts/data/analyses/rpcary/teaching/Section2/bash_tutorial_5_materials/numbered_lines.txt
+#       First take a look at what's there with cat (it should match the
+#        following)
+#       aaa - 111
+#       bbb - 222
+#       ccc - 333
+#       ddd -
+#       444
+#       
+#       Then use sort--
+#       []$ sort numbered_lines.txt
+#       The 4's should have jumped to the top. What if you sort numerically?
+#       sort numbered_lines.txt -n
+#       Did you get what you expected? The important concept here is that 
+#       each line is treated as an element for sorting (unless you use the
+#       -t option to set a new field separator). Try sorting by the third
+#       column (-k 3).
+#       []$ sort numbered_lines.txt -k 3
+#       Then try the first column
+#       []$ sort numbered_lines.txt -k 1
+#       Finally try sorting by the first column numerically
+#       []$ sort numbered_lines.txt -k 1 -n
+#       What you should notice, is that when sorting as a string, numbers
+#       come before letters. When sorting numerically, letters come before
+#       numbers. Why? That's outside the scope of this tutorial, but I
+#       encourage you to find out after the tutorial if you're curious. 
+#
+#   5. There is a pre-sorted file, which we will use to demonstrate two
+#       final bits of functionality. See --
+#       /mounts/data/analyses/rpcary/teaching/Section2/bash_tutorial_5_materials/alpha_shift.txt
+#       If you use cat or sort, you should get the same output.
+#       Now try the -r option to reverse the order of sort
+#       []$ sort alphashift.txt -r
+#       Finally, if you wish to scramble the order of a list (for testing
+#       purposes, say), you can use the -R 'random-sort' option
+#       []$ sort alphashift.txt -R
+# You made it through sort! All other exercises will be shorter. Promise.
+
+
+### Pattern Matching (and Regular Expressions) ###
+
+#bash comes with a number of conventions that allow you, the programmer,
+# to match any number of words, groupings of texts, and/or specific strings
+# that you wish. We will cover only a few of the basics, to help you
+# understand why pattern matching and regular expressions are useful. The 
+# best way to learn this topic, however, seems to be independent practice.
+
+#First, a couple of reference tables (taken largely from www.tldp.org Tools)
+#<http://www.tldp.org/LDP/GNU-Linux-Tools-Summary/html/x11655.htm>
+-----bash (a.k.a 'standard')-----
+# *     (asterisk)          - Can represent zero or more characters of any 
+#                               kind.
+# ?     (question mark)     - Can represent any single character.
+# []    (square brackets)   - Represents a range, e.g. [0-9],[A-Za-z] for 
+#                               matching a single character.
+# {}    (curly brackets)    - Allows creation of a 'set' of operations,
+#                               so `ls {*.txt,*.bash}` would only show files
+#                               with .txt or .bash as extensions. Likewise
+#                               {*.txt,*.bash,*.bz2} would find all three. 
+#                               Also allows 'expansion', e.g. {1..100}
+#                               would generate the series of integers from
+#                               1 to 100. {a..z} all lowercase letters a-z.
+# [!]   (exclamation)       - The exclamation mark works as a logical NOT
+#                               when inside brackets, allowing you to find 
+#                               anything NOT within the specified range.
+# \     (backslash)         - Used to 'escape' the next character, telling 
+#                               the interpreter (bash) to treat the next
+#                               character in a special way. This is the only
+#                               way to refer to spaces or other special 
+#                               characters in paths or file names. 
+
+-----regular expressions a.k.a. 'regex' (works within grep,sed,find)-----
+# .     (dot)               - Will match any single character.
+#
+# \     (backslash)         - Escape character. Used to include special
+#                               characters in searches, or provide special
+#                               behavior (i.e. matching a '.' or changing
+#                               the letter case)
+#
+# *     (asterisk)          - The preceding item is to be matched zero or 
+#                               more times. 
+#
+# .*    (dot asterisk)      - Can represent zero or more characters of any 
+#                               kind. Equivalent to * in bash.
+#
+# ^     (caret / BEGIN)     - Will match the null start-of-line character.
+#
+# $     (dollar sign / END) - Will match the null end-of-line character.
+#
+# []    (square brackets)   - Will match a single character specified by the
+#                               range within the brackets (e.g. a-z,A-Z,0-9)
+#
+# |     (pipe / OR)         - Serves as a logical OR, i.e. match case1 OR 
+#                               case2. 
+#
+# [^]   (caret / NOT)       - Match anything NOT in the specified range,
+#                               e.g. [^m-z] would match the first 13 letters
+#                               of the alphabet, and any numbers or special
+#                               characters. 
+
+### Finding text ###
+#Finding text is a common task in any computing environment. Sometimes you
+# need to select a specific line, and sometimes only a path or a name. One 
+# of the easiest tools to get comfortable with is 'grep'.
+
+## grep ##
+#grep will be your friend soon. If you pipe any long block of text into grep
+# it's default behavior is to return only the lines with a matching letter, 
+# keyword, phrase, or pattern. Let's look at how to use it.
+Syntax: grep [pattern] [file]
+#You can pipe or direct information directly into grep... e.g.
+#   []$ cat file.txt | grep 'pattern'
+#   []# grep 'pattern' < file.txt
+
+#Exercises:
+#   1. It may not have been obvious, but I formatted the previous tutorials
+#       so that I could 'grep' for the headers and subheaders like so:
+#       []$ grep '## ' bash_tutorial_4_basic_toolkit_files.txt
+#       The output should look like the following:
+#       ### NAVIGATION ###
+#       ## ls ##
+#       ## history ##
+#       ## find ##
+#       ### COMPRESSION ###
+#       ## tar ##
+#       ## bzip2 ##
+#       
+#       Nice, right? By matching two hashes and a space, we can find the
+#       lines formatted as headers. If we searched for three hashes and a 
+#       space, we would only get the two section headers. Go ahead and try.
+#   2. Say we want to find just the lines from the last tutorial where we
+#       were using the 'tar' command. We could do this by matching the
+#       the prompt and the command.
+#       []$ grep '$ tar' bash_tutorial_4_basic_toolkit_files.txt
+#       Handy! It gets even better...
+#   3. Say you want not only the text that matches a pattern, but also the 
+#       text which directly follows it. For this, there is the '-A' flag. 
+#       Let's try getting the first seven lines of text in this tutorial 
+#       after the "Pattern" string in "Pattern Matching" above. 
+#       []$ grep 'Pattern' -A 7 bash_tutorial_5_basic_toolkit_text.txt
+#       Deja vu? Inception? You should get two selections from this 
+#       tutorial. One from the section header (line 134), and one from this
+#       example...including this very text! Note that the 'groups' of 
+#       returned text are separated by the double hyphen '--'. The -B option
+#       will print n lines before the matched pattern (e.g. -B 4 would print
+#       4 previous lines). 
+#
+#While there are tons of ways to use grep, I'll try to keep this tutorial to
+# 300-ish lines. Moving on then....
+
+### Replacing text ###
+--non-interactive i.e. 'scriptable' replacement--
+#There are two or three relatively simple ways to replace text that work 
+# best in different situations. These are the the 'tr' or transliterate 
+# command, the 'sed' command, and the builtin 'brace-replace' functionality
+# of bash parameter substitution. While 'tr' and the 'brace-replace' method
+# are useful, the functionality of sed will cover all use-cases that we will
+# be handling for these tutorials. For that reason, and to keep these 
+# tutorials to a semi-reasonable length, only sed will be covered below.
+
+## sed ##
+#sed has a whole range of functionality, but we'll just start with the part
+# that most people use, which is the pattern-substitution function. The
+# format of these substitutions is...
+#Syntax: 
+#   sed [execution flags] 's/[pattern]/[replacement]/[flags]'
+#Ex--
+#You have some text...(the most popular [blank] in US in descending order)
+# For the purposes of the later exercises, the text is stored in a file 
+# named 'addresses.txt' in the Section2/
+#Text--
+#Given Name Surname     Address Street(w/o #s)  City
+#Michael    Smith       1       Main St.        New York
+#James      Johnson     100     Park St.        Los Angeles
+#John       Williams    200     Maple St.       Chicago
+#Robert     Brown       300     Pine St.        Houston
+#David      Jones       400     Oak St.         Philadelphia
+#
+#Great. Now let's replace something.
+Examples:
+#   1. Let's replace a string of 5 letters that only appears once, with
+#       another string of 5 letters. 
+#   []$ sed 's/Smith/Smyth/g' addresses.txt
+#       You should be seeing a 'Michael Smyth' in the lists now. 
+#   2. What happens if you replace a string with a different length?
+#   []$ sed 's/Michael/Mary/g' addresses.txt
+#       You now have a Mary Smith, but the columns aren't aligned.
+#   3. The text is formatted with 'tab' characters. To signal a 'tab' in sed
+#       you need to use a special sequence of characters that mean 'tab'.
+#       For now, just know that sed will interpret '\t' as a tab. Similarly
+#       it will interpret '\n' as a 'newline'.
+#   []$ sed 's/Michael/Mary\t/g' addresses.txt
+#       Columns aligned again? Good.
+#
+#Okay, I lied a little when I said we'd only be replacing text. Let's use 
+# sed to delete the header line. 
+    []$ sed '1d' addresses.txt
+#This prints the following; that is, everything but the first line.
+#
+#Michael    Smith       1       Main St.        New York
+#James      Johnson     100     Park St.        Los Angeles
+#John       Williams    200     Maple St.       Chicago
+#Robert     Brown       300     Pine St.        Houston
+#David      Jones       400     Oak St.         Philadelphia
+
+
+#   4. If we 'pipe' the output of that sed command into our next one,
+#       we can 'cleanly' update the list without the headers. What's our 
+#       objective? Replace all instances of 'St.' with 'ST'. Selective
+#       capitalization or de-capitalization of text can be pretty useful in
+#       certain circumstances. We're getting rid of the first line since 
+#       the 'St' in 'Street(w/o #s)' can be confusing if you don't match
+#       the dot '.'
+#   []$ sed '1d' addresses.txt | sed 's/\(St\)\./\U\1/g'
+#       We just sprang two new things on you. First the '\( ... \)' allows
+#       you to create a 'group' that you can then apply fun things to, like 
+#       capitalization (Uppercase via the \U modifier to the \1 group).
+#       Second, we "escaped" the dot '\.' because a dot by itself in a
+#       regular expressions means match any single character. The equivalent
+#       in bash would be the question mark '?', which confusingly enough,
+#       will match *any single character* OR *no characters* in regular
+#       expressions (see tables above).
+#   []$ sed '1d' addresses.txt | sed 's/\(St\)/\U\1/g'
+#       To demonstrate what happens if you don't include the 'escaped' dot,
+#       you end up with "ST." instead of just "ST"
+
+#Hooray! All done with the basic toolkit--text. If you don't feel 100% 
+# confident in your knowledge of this section, that's okay! Just come back
+# later and have another look at it. For now, all I want you to know is the
+# capabilities of the basic toolkit. Remembering the little eccentricities
+# of each function is beyond the scope of these tutorials. 
+# And now, on to the main event. Scripting! Please continue to the next 
+# exercise (tutorial 6) when you're ready for more.

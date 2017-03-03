@@ -1,0 +1,6 @@
+Given Name Surname     Address Street      City
+Michael    Smith       1       Main St.    New York
+James      Johnson     100     Park St.    Los Angeles
+John       Williams    200     Maple St.   Chicago
+Robert     Brown       300     Pine St.    Houston
+David      Jones       400     Oak St.     Philadelphia

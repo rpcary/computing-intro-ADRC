@@ -1,0 +1,225 @@
+#This is a tutorial which will help you understand the 'basic toolkit' of 
+# programs in bash as they relate to handling files
+#The line width was standardized to 77 columns, for those who wish to view
+# on smaller displays. 
+
+### NAVIGATION ###
+
+## ls ##
+
+#The ls command was covered in a previous tutorial, but there are some more
+# points to make for this session.
+#You should get to know many of the optional flags in order to see what is 
+# on the filesystem more easily.
+# A quick-reference for options is included below. 
+# Note: You can always see all options with 'man ls'
+#[user@machine]$ ls [-flag] [dir]
+#    -a, --all              --do not ignore entries starting with "."
+#    -d, --directory        --list directories instead of files/contents
+#    -h, --human-readable   --with -l, file sizes in K,M,G instead of Bytes
+#    -l, --long             --use a long listing format
+#    -r, --reverse          --reverse order while sorting
+#    -R, --recursive        --list subdirectories recursively
+#    -t                     --sort by modification time
+#    -1                     --list one file per line
+
+#Another nice bit about ls is combining flags. For example 'ls -lrt' will
+# print files in the 'l'ong format, 'r'everse-sorted by 't'ime, meaning the
+# most recent files will show up on bottom, closest to the next prompt.
+# This can be desirable when copy/pasting
+
+#Try some of these now. 
+#   1. have a look at your home directory with the -a option. See anything?
+#   2. look at the root directory (/) with the -1 option. Easier to read?
+#   3. look at some imaging data (/mounts/data/preprocessed/visits/...) 
+#       with the -lh options to see the 'size' of the imaging data (or -lhS)
+#       See also: https://en.wikipedia.org/wiki/File_size
+
+## history ##
+
+#The history built-in can be incredibly useful, especially as you learn to 
+#search for text and can query your previous commands (the number is set by 
+# default). Just type 'history' at the command line and hit enter.
+# 
+#Take a look through your history now (no arguments needed). Later, using
+# grep you will be able to search your history for specific commands.
+#
+#Also note that if you want to access previous commands, you can simply use
+# the 'up arrow' ↑ to access your history one command at a time.
+
+
+## find ##
+
+#The find program could have a tutorial of its own, since it also allows you
+# to execute commands with the -exec flag. We'll stick to the basics here.
+#syntax: find 'directory (or directories) to search' [options]
+#Examples:
+#1--
+#Say I want to look for all directories (at any depth) in my home directory
+# with the name 'tmp', because I don't remember where I dropped a temp file.
+#Ex--
+#...$ find ~ -name 'tmp' -type d
+#Returns -->
+#           /home/user/matlab/tmp
+#           /home/user/tmp
+#           /home/user/jgrid_executables/tmp
+#
+#The first argument is the search location, where '~' refers to my home
+# directory
+#The second argument is a flag that tells find to match the names of items 
+# it finds to the text that follows the flag (i.e. after a space).
+#The fourth argument is another flag, '-type' which restricts the search to
+# directories (d) only.
+#
+#2--
+#Now, say I know a kind of file is in two of three locations, possibly hidden
+# three or four folders deep, all of which branch from two locations -- 
+# We'll call the locations FolderA and FolderC in the example below. For the
+# sake of this example, I don't know exactly where the files are.
+#See the following example tree where we are looking for the two files which
+# end with the letter 'b'. I tried to re-create the 'organic' feel of many
+# 'slapdash' or piecemeal file organization schemes.
+#TREE:
+#.
+#/  FolderA
+#|      |   file1
+#|      |   file2
+#|      /   FolderA1
+#|      |   /   fileA1a
+#|      |   /   fileA1b
+#|      /   FolderA2
+#|          /   file5
+#/  FolderB
+#|      /   FolderB1
+#/  FolderC
+#       /   FolderC1
+#       |   file3
+#       |   file4
+#       /   FolderC3
+#           |   fileC2a       
+#           /   FolderC3a
+#               /   fileC3aa
+#               /   fileC3ab
+#
+#
+#Using ls *b; ls */*b; ls */*/*b ...where the * is a wildcard which can
+# stand in for any folder name, is very inefficient, and difficult to manage
+# as the number of files and folders increases. The better and more usable
+# method is to use the 'maxdepth' and 'mindepth' options of the find
+# function. 
+#Ex--
+#...$ find FolderA FolderC -name '*b' -maxdepth 4 -mindepth 2 
+#Returns -->
+        [/path/to]/FolderA/FolderA1/fileA1b
+        [/path/to]/FolderC/FolderC3/FolderC3a/fileC3ab
+
+#Note how you can restrict your searches to specific folders by listing them
+# as the first arguments to find. When adding wildcards to find, you need to
+# enclose them in single or double quotes so that bash doesn't expand them,
+# but passes the wildcard to the find function. 
+
+#Also, some useful 'types' to filter by
+#       -d      --find only directories
+#       -f      --find only files
+#       -l      --find only links
+
+#Exercises:
+#   1. Get a list of the hidden files and folders in your home directory 
+#       find ~ -name '.*'
+#   2. Now restrict it to just the files (hint: look up 8 lines for filters)
+#   3. Look for bash startup files in the /etc directory.
+#       find /etc -name 'bash*'
+#       --Get any 'Permission denied' errors? Good! If you had access to all
+#        of these files and directories it would be too easy for any user to
+#        accidentally (or maliciously) change them. Security!
+#   4. Try to 'find' the preprocessed directories for a given investigator.
+#       find /mounts/data/preprocessed/visits -name 'bendlin*' -type d ...
+#       ... -maxdepth 1
+
+### COMPRESSION ###
+
+## tar ##
+
+#The tar command is best suited to making one file out of many. With a
+# little practice, the tar command should be simple to use. 
+#Why use tar? 
+#After making a single file, you can compress that file more easily, and 
+# *most importantly* move that file more easily. Some disadvantages of tar
+# are the time-cost of archiving files, un-archiving those files when
+# needed, and the increased need for indexing once your archived files are
+# no longer visible to the filesystem. 
+
+#Syntax: tar [OPTION...] [File]...
+#Ex--
+#...$ tar -cvf archive.tar file1 file2 file3
+#   The above example would make an 'archive.tar' file out of the three
+#    listed files {1,2,3}. The original files would still be untouched and
+#    the archive can be used as a backup. The 'c' option 'creates' the
+#    archive. The 'v' option is 'verbose,' to print all actions. The 'f'
+#    option means that the next argument will be the name of the archive
+#    that will be created or extracted from.
+#Ex--
+#...$ tar -xvf archive.tar
+#   The '-xvf' flags will 'extract','verbose'-ly, on the archive.tar file.
+#    Thus, all of the previously archived files will be extracted. 
+#Exercise:
+#   If you haven't already copied the whole Section2 directory...
+#   Go to the tutorial 4 materials --
+#   /mounts/data/analyses/rpcary/teaching/Section2/bash_tutorial_4_materials
+#   ...and make a copy in your home directory after reading the README 
+#   Then, navigate to the copy in your home directory
+#   (cd ~/bash_tutorial_4_materials) and check that you are actually there
+#   with the pwd command. 
+#   1. Try the following to make an archive
+#       []$ tar -cvf archive.tar file1 file2 file3
+#       You should now have a file named archive.tar
+#   2. Check the size of your archive. ... it's...bigger than the sum of the
+#       files? What if you use built-in compression tool with the '-z' flag?
+#       []$ tar -cvzf archive2.tar file1 file2 file3
+#       Hooray. You now have a compressed tar file!
+
+## bzip2 ##
+
+#There are a number of programs for compressing large files into smaller
+# ones. Some older programs like 'compress', or 'pack', have been
+# replaced with 'gzip', 'bzip2', and partially by the archive/compression 
+# program 'tar'. We will use the 'bzip2' program, since it exists on the 
+# ADRC filesystem and is easy to use. 
+#Ex--
+#...$ bzip2 -k file1.txt
+#   The '-k' flag 'keeps' the original file, this is normally desired for
+#   file backups (or for examples). 
+#Exercises:
+#   Make a copy of the tutorial 4 materials (if you haven't already) and 
+#   navigate to your copied folder.
+#   1. Let's say you want to individually compress all files that match a 
+#       given pattern... in our case 'file' followed by a single character.
+#       It will be covered in a later lesson, but the question mark '?' can
+#       be used in bash to match a single character. So try the following...
+#       []$ bzip2 file?
+#       You should see each of the three matching files with a new extension
+#       (.bz2) and their file size should be smaller than when you started.
+#   2. To uncompress those same files...
+#       []$ bzip2 -d file?.bz2 
+#       Et voila ... back to where you started, with the original files!
+#   3. Try compressing a tar-ed archive... 
+#       []$ tar -cvf archive.tar file*
+#       to get a 'normal' archive ... and then
+#       []$ tar -cvzf archive2.tar file*
+#       to get the 'compressed' archive3.tar file...and then
+#       []$ bzip2 archive.tar
+#       which will get you a file 'archive.tar.bz2' which has been archived
+#       and then compressed... for a better (smaller) final file size.
+#       This is an extra step, and the savings are small vs. the tar -z
+#       option in this example. There are times (especially with imaging
+#       data) where a more aggressive compression at the cost of time will 
+#       be preferred to buying more storage space.
+#   4. What happens if you try to compress an already compressed file?
+#   5. Compress again?
+
+#Congratulations! You've finished tutorial number 4.
+#Hopefully you've made it this far with some attention left, so you can 
+# continue on to the next tutorial ..."#5 the 'basic toolkit' -- text"
+#If not, take a break. Go do something else, and come back when you're 
+# ready. It is difficult, if not impossible, to properly learn bash in one
+# sitting. ...and on that bright note...good luck on the next section!
